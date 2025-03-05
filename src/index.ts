@@ -26,14 +26,18 @@ import {
   runCodeReviewTool,
 } from "./tools/codeReview.js";
 
-/**
- * A minimal MCP server providing three Cursor Tools:
- *   1) Screenshot
- *   2) Architect
- *   3) CodeReview
- */
+import { z } from "zod";
+import fs from "fs/promises";
 
-// 1. Create an MCP server instance
+// Define schemas for read_file and read_multiple_files
+const ReadFileArgsSchema = z.object({
+  path: z.string(),
+});
+
+const ReadMultipleFilesArgsSchema = z.object({
+  paths: z.array(z.string()),
+});
+
 const server = new Server(
   {
     name: "cursor-tools",
@@ -43,10 +47,10 @@ const server = new Server(
     capabilities: {
       tools: {},
     },
-  },
+  }
 );
 
-// 2. Define the list of tools
+// Define the list of tools
 server.setRequestHandler(ListToolsRequestSchema, async () => {
   return {
     tools: [
@@ -106,11 +110,42 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           required: ["folderPath"],
         },
       },
+      {
+        name: "read_file",
+        description: "Read the contents of a single file",
+        inputSchema: {
+          type: "object",
+          properties: {
+            path: {
+              type: "string",
+              description: "Full path to the file to read",
+            },
+          },
+          required: ["path"],
+        },
+      },
+      {
+        name: "read_multiple_files",
+        description: "Read the contents of multiple files",
+        inputSchema: {
+          type: "object",
+          properties: {
+            paths: {
+              type: "array",
+              items: {
+                type: "string",
+              },
+              description: "Array of full paths to files to read",
+            },
+          },
+          required: ["paths"],
+        },
+      },
     ],
   };
 });
 
-// 3. Implement the tool call logic
+// Implement tool call logic with read_file and read_multiple_files
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
   const { name, arguments: args } = request.params;
 
@@ -127,12 +162,61 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       const validated = CodeReviewToolSchema.parse(args);
       return await runCodeReviewTool(validated);
     }
+    case "read_file": {
+      const parsed = ReadFileArgsSchema.safeParse(args);
+      if (!parsed.success) {
+        throw new Error(`Invalid arguments for read_file: ${parsed.error}`);
+      }
+      try {
+        const content = await fs.readFile(parsed.data.path, "utf-8");
+        return {
+          content: [{ type: "text", text: content }],
+        };
+      } catch (error) {
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Error reading file ${parsed.data.path}: ${
+                error instanceof Error ? error.message : String(error)
+              }`,
+            },
+          ],
+          isError: true,
+        };
+      }
+    }
+    case "read_multiple_files": {
+      const parsed = ReadMultipleFilesArgsSchema.safeParse(args);
+      if (!parsed.success) {
+        throw new Error(
+          `Invalid arguments for read_multiple_files: ${parsed.error}`
+        );
+      }
+
+      const results = await Promise.all(
+        parsed.data.paths.map(async (filePath) => {
+          try {
+            const content = await fs.readFile(filePath, "utf-8");
+            return `${filePath}:\n${content}\n`;
+          } catch (error) {
+            const errorMessage =
+              error instanceof Error ? error.message : String(error);
+            return `${filePath}: Error - ${errorMessage}`;
+          }
+        })
+      );
+
+      return {
+        content: [{ type: "text", text: results.join("\n---\n") }],
+      };
+    }
     default:
       throw new Error(`Unknown tool: ${name}`);
   }
 });
 
-// 4. Start the MCP server with a stdio transport
+// Start the MCP server with a stdio transport
 async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
