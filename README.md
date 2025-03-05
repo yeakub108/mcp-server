@@ -59,7 +59,7 @@ This project is designed to be used as an MCP server in Cursor. Here's how to se
 
 After adding the server, you should see your tools listed under "Available Tools". If not, try clicking the refresh button in the top right corner of the MCP server section.
 
-For more details about MCP setup, check out the [Cursor MCP Documentation](https://docs.cursor.com/advanced/model-context-protocol).
+For more details about MCP setup, check out the [Windsurf MCP Documentation](https://docs.codeium.com/windsurf/mcp) and [Cursor MCP Documentation](https://docs.cursor.com/advanced/model-context-protocol).
 
 ## 🛠️ Using the Tools
 
@@ -88,25 +88,4 @@ src/
 └── index.ts           # Main entry point
 ```
 
-## 🤝 Contributing
-
-Contributions welcome! Please feel free to submit a Pull Request.
-
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🐛 Issues & Support
-
-Found a bug or need help? Open an issue with:
-
-1. What you were trying to do
-2. What happened instead
-3. Steps to reproduce
-4. Your environment details
-
 ---
-
-I'll be honest though, this is a tutorial demo, and not a production-ready tool so I likely won't be fixing issues. But feel free to fork it and make it your own!
-
-Made with ❤️ by developers, for developers
