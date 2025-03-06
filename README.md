@@ -43,23 +43,32 @@ yarn install
 npm run build
 ```
 
-### 4. Adding to Cursor
+### 4. Open Windsurf Chat and Configure MCP
 
 This project is designed to be used as an MCP server in Cursor. Here's how to set it up:
 
-1. Open Cursor
-2. Go to `Cursor Settings > Features > MCP`
-3. Click `+ Add New MCP Server`
-4. Fill out the form:
-   - **Name**: AI Development Assistant
-   - **Type**: stdio
-   - **Command**: `node /path/to/your/project/dist/index.js`
+1. Open Windsurf on your system.
+2. Navigate to the Chat section.
+3. Click `+ Configure MCP` (this allows you to add a new MCP server).
+4. Add the following JSON configuration:
+```npm
+{
+  "mcpServers": {
+    "mcp-server": {
+      "command": "node",
+      "args": [
+        "D:\\mpc-server\\build\\index.js"
+      ]
+    }
+  }
+}
+```
 
 > 📘 **Pro Tip**: You might need to use the full path to your project's built index.js file.
 
 After adding the server, you should see your tools listed under "Available Tools". If not, try clicking the refresh button in the top right corner of the MCP server section.
 
-For more details about MCP setup, check out the [Windsurf MCP Documentation](https://docs.codeium.com/windsurf/mcp) and [Cursor MCP Documentation](https://docs.cursor.com/advanced/model-context-protocol).
+For more details about MCP setup, check out the [Windsurf MCP Documentation](https://docs.codeium.com/windsurf/mcp).
 
 ## 🛠️ Using the Tools
 

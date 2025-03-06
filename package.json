@@ -1,14 +1,11 @@
 {
   "name": "mcp-server",
   "version": "2.0.1",
-  "description": "MCP Server with three Cursor Tools: Screenshot, Architect, and Code Review",
+  "description": "MCP Server with three Windsurf Tools: Screenshot, Architect, and Code Review",
   "type": "module",
   "scripts": {
     "build": "tsc && node -e \"require('fs').chmodSync('build/index.js', '755')\"",
     "start": "node build/index.js"
-  },
-  "bin": {
-    "cursor-tools": "./build/index.js"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.4.1",

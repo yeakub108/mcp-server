@@ -26,21 +26,16 @@ import {
   runCodeReviewTool,
 } from "./tools/codeReview.js";
 
-import { z } from "zod";
-import fs from "fs/promises";
-
-// Define schemas for read_file and read_multiple_files
-const ReadFileArgsSchema = z.object({
-  path: z.string(),
-});
-
-const ReadMultipleFilesArgsSchema = z.object({
-  paths: z.array(z.string()),
-});
+import {
+  ReadFileArgsSchema,
+  ReadMultipleFilesArgsSchema,
+  runReadFile,
+  runReadMultipleFiles,
+} from "./tools/fileReader.js";
 
 const server = new Server(
   {
-    name: "cursor-tools",
+    name: "windsurf-tools",
     version: "2.0.1",
   },
   {
@@ -145,7 +140,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
   };
 });
 
-// Implement tool call logic with read_file and read_multiple_files
+// Implement tool call logic
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
   const { name, arguments: args } = request.params;
 
@@ -163,53 +158,12 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       return await runCodeReviewTool(validated);
     }
     case "read_file": {
-      const parsed = ReadFileArgsSchema.safeParse(args);
-      if (!parsed.success) {
-        throw new Error(`Invalid arguments for read_file: ${parsed.error}`);
-      }
-      try {
-        const content = await fs.readFile(parsed.data.path, "utf-8");
-        return {
-          content: [{ type: "text", text: content }],
-        };
-      } catch (error) {
-        return {
-          content: [
-            {
-              type: "text",
-              text: `Error reading file ${parsed.data.path}: ${
-                error instanceof Error ? error.message : String(error)
-              }`,
-            },
-          ],
-          isError: true,
-        };
-      }
+      const validated = ReadFileArgsSchema.parse(args);
+      return await runReadFile(validated);
     }
     case "read_multiple_files": {
-      const parsed = ReadMultipleFilesArgsSchema.safeParse(args);
-      if (!parsed.success) {
-        throw new Error(
-          `Invalid arguments for read_multiple_files: ${parsed.error}`
-        );
-      }
-
-      const results = await Promise.all(
-        parsed.data.paths.map(async (filePath) => {
-          try {
-            const content = await fs.readFile(filePath, "utf-8");
-            return `${filePath}:\n${content}\n`;
-          } catch (error) {
-            const errorMessage =
-              error instanceof Error ? error.message : String(error);
-            return `${filePath}: Error - ${errorMessage}`;
-          }
-        })
-      );
-
-      return {
-        content: [{ type: "text", text: results.join("\n---\n") }],
-      };
+      const validated = ReadMultipleFilesArgsSchema.parse(args);
+      return await runReadMultipleFiles(validated);
     }
     default:
       throw new Error(`Unknown tool: ${name}`);
@@ -220,7 +174,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.error("Cursor Tools MCP Server running on stdio");
+  console.error("Windsurf Tools MCP Server running on stdio");
 }
 
 main().catch((error) => {
