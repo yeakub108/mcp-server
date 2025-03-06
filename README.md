@@ -87,6 +87,7 @@ For example, try typing in Composer:
 - "Review this code for best practices"
 - "Help me architect a new feature"
 - "Analyze this UI screenshot"
+- "Read single file & Read multiple files"
 
 The agent will ask for your approval before making any tool calls.
 
