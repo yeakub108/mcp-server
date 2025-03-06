@@ -16,6 +16,12 @@ Take UI design screenshots and use them with the composer agent.
 
 Use git diffs to trigger code reviews.
 
+### 📄 Read file & Read multiple files
+
+Single-file reading enables efficient data analysis; multi-file reading facilitates bulk data processing.
+
+</br>
+
 ## 🚀 Getting Started
 
 ### 1. Environment Setup
@@ -70,6 +76,8 @@ After adding the server, you should see your tools listed under "Available Tools
 
 For more details about MCP setup, check out the [Windsurf MCP Documentation](https://docs.codeium.com/windsurf/mcp).
 
+</br>
+
 ## 🛠️ Using the Tools
 
 Once configured, you can use these tools directly in Cursor's Composer. The AI will automatically suggest using relevant tools, or you can explicitly request them by name or description.
@@ -84,6 +92,8 @@ The agent will ask for your approval before making any tool calls.
 
 > 📘 **Pro Tip**: You can update your .cursorrules file with instructions on how to use the tools for certain scenarios, and the agent will use the tools automatically.
 
+</br>
+
 ## 📁 Project Structure
 
 ```
@@ -91,6 +101,7 @@ src/
 ├── tools/
 │   ├── architect.ts    # Code structure generator
 │   ├── screenshot.ts   # Screenshot analysis tool
+│   ├── fileReader.ts  # read file & read multiple files tool
 │   └── codeReview.ts   # Code review tool
 ├── env/
 │   └── keys.ts         # Environment configuration (add your API keys here!)
